@@ -1,0 +1,176 @@
+{
+	"info": {
+		"_postman_id": "2076026a-26b6-4866-b8fe-56faff6d8894",
+		"name": "Assignment4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50571861",
+		"_collection_link": "https://pe-64e76-3115734.postman.co/workspace/dbd0ccd2-439f-4174-84cf-abdc25efd41e/collection/50571861-2076026a-26b6-4866-b8fe-56faff6d8894?action=share&source=collection_link&creator=50571861"
+	},
+	"item": [
+		{
+			"name": "addUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Morgan\",\r\n    \"age\": 60,\r\n    \"email\": \"fayek@email.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/user",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"age\": 25,\r\n    \"email\":\"jos03@email.com\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/user/99",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"99"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Morgan\",\r\n    \"age\": 60,\r\n    \"email\": \"fayek@email.com\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/user/99",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"99"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UserByName",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:3000/user/byName?name=Ahmed",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"byName"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Ahmed"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:3000/user",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Filtering",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:3000/user/filter?minAge=70",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"filter"
+					],
+					"query": [
+						{
+							"key": "minAge",
+							"value": "70"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
