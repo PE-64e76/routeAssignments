@@ -1,0 +1,90 @@
+1- db.createCollection("books", {
+  validator: { $and: [{ title: { $type: "string" } }, { title: { $ne: "" } }] },})
+
+2- db.authors.insertOne({ name: "George Orwell", age: 46 })
+
+3- db.createCollection("logs", { capped: true, size: 1024 * 1024 })
+
+4- db.books.createIndex({ title: 1 })
+
+5- db.books.insertOne({
+  title: "Future",
+  author: "John Doe",
+  year: 2019,
+  genres: ["Science Fiction"]
+})
+
+6- db.books.insertMany([
+  {
+    title: "Brave New World",
+    author: "Aldous Huxley",
+    year: 1932,
+    genres: ["Science Fiction"]
+  },
+  {
+    title: "The Road",
+    author: "Cormac McCarthy",
+    year: 2006,
+    genres: ["Drama"]
+  },
+  {
+    title: "Dune",
+    author: "Frank Herbert",
+    year: 1965,
+    genres: ["Science Fiction"]
+  }
+])
+
+7- db.logs.insertOne({
+  action: "ADD_BOOK",
+  createdAt: new Date()
+})
+
+8- db.books.updateOne(
+  { title: "Future" },
+  { $set: { year: 2022 } }
+)
+
+9- db.books.findOne({ title: "Brave New World" })
+
+10- db.books.find({year: { $gte: 1990, $lte: 2010 }})
+
+11-db.books.find({genres: { $in: ["Science Fiction"] }})
+
+12- db.books.find().sort({ year: -1 }).skip(2).limit(3)
+
+13-db.books.find({year: { $type: "int" }})
+
+14- db.books.find({genres: { $nin: ["Horror", "Science Fiction"] }})
+
+15- db.books.deleteMany({year: { $lt: 2000 }})
+
+16- db.books.aggregate([
+  { $match: { year: { $gt: 2000 } } },
+  { $sort: { year: -1 } }
+])
+
+17-db.books.aggregate([
+  { $match: { year: { $gt: 2000 } } },
+  {
+    $project: {
+      _id: 0,
+      title: 1,
+      author: 1,
+      year: 1
+    }
+  }
+])
+
+18-db.books.aggregate([{ $unwind: "$genres" }])
+
+19-db.books.aggregate([
+  {
+    $lookup: {
+      from: "logs",
+      localField: "_id",
+      foreignField: "bookId",
+      as: "logs"
+    }
+  }
+])
