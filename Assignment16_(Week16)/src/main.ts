@@ -46,7 +46,7 @@ class User {
       console.log(`NoteBook "${title}" not found.`);
     } else {
       this.notebooks.splice(index, 1);
-      console.log(`NoteBook "${title}" removed from user "${this.name}".`);
+      console.log(`NoteBook "${title}" removed from user "${this.name}".`)
     }
   }
 
