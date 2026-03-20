@@ -1,5 +1,4 @@
-
-import { providerEnum } from "../../common/enums/user.enum.js";
+import { emailEnum, providerEnum } from "../../common/enums/index.js";
 import { BadRequestException, ConfilectException, NotFoundException } from "../../common/utils/response/error.response.js";
 import { UserModel, create, createOne, findOne, findOneAndUpdate } from "../../DB/index.js";
 import { compareHash, generateHash } from "../../common/utils/security/hash.security.js";
@@ -9,7 +8,6 @@ import { OAuth2Client } from 'google-auth-library';
 import { CLIENT_IDS, ORIGINS } from "../../../config/config.service.js";
 import { createNumberOtp, emailEmitter, emailTemplate, sendEmail } from "../../common/utils/index.js";
 import { baseRevokeTokenKey, deleteKey, forgotPasswordLinkKey, get, increment, keys, otpBlockKey, otpKey, otpMaxRequestKey, set, ttl } from "../../common/services/index.js";
-import { emailEnum } from "../../common/enums/email.enum.js";
 import { randomUUID } from "crypto";
 
 const verifyEmailOtp = async ({email, subject = emailEnum.ConfirmEmail, title = "Verify Account"} = {}) => {

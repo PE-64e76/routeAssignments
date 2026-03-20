@@ -9,9 +9,12 @@ import { fileFieldValidation , localFileUpload } from "../../common/utils/multer
 const router = Router();
 
 
-router.post("/logout", authentication(), async(req,res,next) =>{
-  const status = await logout(req.body, req.user, req.decoded)
-  return successResponse({res, status})
+router.post(
+  "/logout",
+  authentication(), 
+  async(req,res,next) =>{
+    const status = await logout(req.body, req.user, req.decoded)
+    return successResponse({res, status})
 })
 
 router.patch(
@@ -23,12 +26,13 @@ router.patch(
     return successResponse({res , data: {...credentials}})
 })
 
-router.patch("/profile-image", 
+router.patch(
+  "/profile-image", 
   authentication(), 
   localFileUpload({
-      customPath:'user/profile', 
-      validation:fileFieldValidation.image, 
-      maxSize: 5
+    customPath:'user/profile', 
+    validation:fileFieldValidation.image, 
+    maxSize: 5
   }).single("attachment"), 
   validation(validators.profileImage),
   async(req, res, next) => {
@@ -36,12 +40,13 @@ router.patch("/profile-image",
     return successResponse({res, data:{account}})
 })
 
-router.patch("/profile-cover-image", 
+router.patch(
+  "/profile-cover-image", 
   authentication(), 
   localFileUpload({
-      customPath:'user/profile/cover', 
-      validation:fileFieldValidation.image, 
-      maxSize:10
+    customPath:'user/profile/cover', 
+    validation:fileFieldValidation.image, 
+    maxSize:10
   }).array("attachments",5), 
   validation(validators.profileCoverImage),
   async(req, res, next) => {
@@ -49,18 +54,25 @@ router.patch("/profile-cover-image",
     return successResponse({res, data:{account}})
 })
 
-router.get("/", authentication(), /*authorization(endpoint.profile),*/ async (req, res, next) => {
-  const account = await profile(req.user);
-  return successResponse({ res, data: { account } });
+router.get(
+  "/", 
+  authentication(), 
+  async (req, res, next) => {
+    const account = await profile(req.user);
+    return successResponse({ res, data: { account } });
 });
 
 
-router.post("/rotate-token", authentication(tokenTypeEnum.refresh), async (req, res, next) => {
-  const credential = await rotateToken(req.user, req.decoded,`${req.protocol}://${req.host}`);
+router.post(
+  "/rotate-token", 
+  authentication(tokenTypeEnum.refresh), 
+  async (req, res, next) => {
+    const credential = await rotateToken(req.user, req.decoded,`${req.protocol}://${req.host}`);
   return successResponse({res, status:201, data:{...credential}})
 });
 
-router.get("/:userId/share-profile",
+router.get(
+  "/:userId/share-profile",
   validation(validators.shareProfile),
   async (req,res,next) => {
     const account = await shareProfile(req.params.userId)
