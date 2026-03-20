@@ -1,0 +1,35 @@
+import { resolve } from "path";
+import { config } from "dotenv";
+
+export const NODE_ENV = process.env.NODE_ENV;
+
+const envPath = {
+  development: ".env.development",
+  production: ".env.production",
+};
+console.log({ en: envPath[NODE_ENV] });
+
+config({ path: resolve(`./config/${envPath[NODE_ENV]}`) });
+
+export const port = process.env.port ?? 7000;
+
+export const DB_URI = process.env.DB_URI;
+export const ENC_BYTE = process.env.ENC_BYTE;
+export const User_TOKEN_SECRET_KEY = process.env.User_TOKEN_SECRET_KEY;
+export const System_TOKEN_SECRET_KEY = process.env.System_TOKEN_SECRET_KEY;
+export const User_REFRESH_TOKEN_SECRET_KEY = process.env.User_REFRESH_TOKEN_SECRET_KEY;
+export const System_REFRESH_TOKEN_SECRET_KEY = process.env.System_REFRESH_TOKEN_SECRET_KEY;
+export const REFRESH_EXPIRES_IN = parseInt(process.env.REFRESH_EXPIRES_IN);
+export const ACCESS_EXPIRES_IN = parseInt(process.env.ACCESS_EXPIRES_IN);
+
+
+
+export const SALT_ROUND = parseInt(process.env.SALT_ROUND ?? '10')
+export const CLIENT_IDS = process.env.CLIENT_IDS?.split(',') || []
+
+export const EMAIL_HOST = process.env.EMAIL_HOST ?? 'smtp.gmail.com'
+export const EMAIL_PORT = process.env.EMAIL_PORT ?? '587'
+export const EMAIL_USER = process.env.EMAIL_USER
+export const EMAIL_PASS = process.env.EMAIL_PASS
+
+export const OTP_EXPIRES_IN_MINUTES = parseInt(process.env.OTP_EXPIRES_IN_MINUTES ?? '5')
