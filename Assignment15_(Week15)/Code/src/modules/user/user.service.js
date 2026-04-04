@@ -7,20 +7,20 @@ import { createLoginCredentials } from "../../common/utils/security/token.securi
 import { findOne } from "../../DB/database.service.js";
 import { UserModel } from "../../DB/index.js";
 
-const createRevokeToken = async ({userId, jti, ttl}) =>{
+const createRevokeToken = async ({ userId, jti, ttl }) => {
   await set({
     key: revokeTokenKey({ userId, jti }),
     value: jti,
     ttl
   });
-  return ;
-}
+  return;
+};
 
-export const updatePassword = async ({oldPassword, password}, user, issuer) => {
+export const updatePassword = async ({ oldPassword, password }, user, issuer) => {
   if (!await compareHash(oldPassword, user.password)) {
-    throw ConfilectException({message:"Invalid old password"})
+    throw ConfilectException({ message: "Invalid old password" });
   }
-  
+
   // for (const hash of user.oldPasswords || []) {
   //   if (await compareHash(password, hash)) {
   //     throw ConfilectException({message:"This password is used before"})
@@ -28,12 +28,12 @@ export const updatePassword = async ({oldPassword, password}, user, issuer) => {
   // }
   // user.oldPasswords.push(user.password)
 
-  user.password = await generateHash(password)
-  user.changeCredentialsTime = new Date()
-  await user.save()
+  user.password = await generateHash(password);
+  user.changeCredentialsTime = new Date();
+  await user.save();
   await deleteKey(await keys(baseRevokeTokenKey(user._id)));
-  return await createLoginCredentials(user, issuer)
-}
+  return await createLoginCredentials(user, issuer);
+};
 
 export const logout = async ({ flag }, user, decoded = {}) => {
   const { jti, iat, sub } = decoded;
@@ -43,7 +43,7 @@ export const logout = async ({ flag }, user, decoded = {}) => {
     case logoutEnum.All:
       user.changeCredentialsTime = new Date();
       await user.save();
-      await deleteKey(await keys(baseRevokeTokenKey(sub)))
+      await deleteKey(await keys(baseRevokeTokenKey(sub)));
       break;
 
     default:
@@ -54,54 +54,54 @@ export const logout = async ({ flag }, user, decoded = {}) => {
         userId: sub,
         jti,
         ttl: iat + REFRESH_EXPIRES_IN
-      })
-      
+      });
+
       status = 201;
       break;
   }
   return status;
 };
 
-export const rotateToken = async (user, {sub, jti, iat}, issuer) => {
+export const rotateToken = async (user, { sub, jti, iat }, issuer) => {
   if ((iat + ACCESS_EXPIRES_IN) * 1000 >= Date.now() + (30000)) {
-    throw ConfilectException({message:"Current access token still valid"})
+    throw ConfilectException({ message: "Current access token still valid" });
   }
   await createRevokeToken({
     userId: sub,
     jti,
     ttl: iat + REFRESH_EXPIRES_IN
-  })
+  });
   return await createLoginCredentials(user, issuer);
 };
 
 export const profileImage = async (file, user) => {
-  user.profilePicture = file.finalPath
-  await user.save()
-  return user
+  user.profilePicture = file.finalPath;
+  await user.save();
+  return user;
 };
 
 export const profileCoverImage = async (files, user) => {
-  user.coverProfilePictures = files.map(file => file.finalPath)
-  await user.save()
-  return user
+  user.coverProfilePictures = files.map(file => file.finalPath);
+  await user.save();
+  return user;
 };
 
 export const profile = async (user) => {
-  return user
+  return user;
 };
 
 
-export const shareProfile = async(userId) =>{
+export const shareProfile = async (userId) => {
   const profile = await findOne({
     model: UserModel,
-    filter:{_id: userId},
+    filter: { _id: userId },
     select: "phone profilePicture firstName lastName email username"
-  })
-  if(!profile){
-    throw BadRequestException({message:"Fail to find matching profile"})
+  });
+  if (!profile) {
+    throw BadRequestException({ message: "Fail to find matching profile" });
   }
-  if(profile.phone){
-    profile.phone = await generateDecryption(profile.phone)
+  if (profile.phone) {
+    profile.phone = await generateDecryption(profile.phone);
   }
-  return profile
-}
+  return profile;
+};

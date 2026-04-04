@@ -3,30 +3,32 @@ import { genderEnum, providerEnum, roleEnum } from "../../common/enums/user.enum
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: {type: String, required: [true, "First name is required"], minLength: 2, maxLength: 25},
-    
-    lastName: {type: String, required: [true, "Last name is required"], minLength: 2, maxLength: 25},
-    
-    email: {type: String, required: true, unique: true},
-    
-    password: {type: String,required: function () {
-      return this.provider == providerEnum.System;
-    }},
-    
-    gender: {type: Number, enum: Object.values(genderEnum), default: genderEnum.Male},
-    
-    provider: {type: Number, enum: Object.values(providerEnum), default: providerEnum.System},
-    
-    role: {type: Number, enum: Object.values(roleEnum), default: roleEnum.User},
-    
+    firstName: { type: String, required: [true, "First name is required"], minLength: 2, maxLength: 25 },
+
+    lastName: { type: String, required: [true, "Last name is required"], minLength: 2, maxLength: 25 },
+
+    email: { type: String, required: true, unique: true },
+
+    password: {
+      type: String, required: function () {
+        return this.provider == providerEnum.System;
+      }
+    },
+
+    gender: { type: Number, enum: Object.values(genderEnum), default: genderEnum.Male },
+
+    provider: { type: Number, enum: Object.values(providerEnum), default: providerEnum.System },
+
+    role: { type: Number, enum: Object.values(roleEnum), default: roleEnum.User },
+
     confirmEmail: Date,
     changeCredentialsTime: Date,
-    
+
     DOB: Date,
-    
-    oldPasswords:[String],
+
+    oldPasswords: [String],
     phone: String,
-    
+
     profilePicture: String,
     coverProfilePictures: [String],
   },
@@ -35,10 +37,10 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
     strict: true,
     strictQuery: true,
-    optimisticConcurrency:true,
-    autoIndex:true,
-    toJSON:{virtuals:true},
-    toObject:{virtuals:true}
+    optimisticConcurrency: true,
+    autoIndex: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
 

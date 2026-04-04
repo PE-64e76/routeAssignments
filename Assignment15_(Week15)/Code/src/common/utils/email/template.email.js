@@ -1,7 +1,7 @@
 import { FACEBOOK_LINK, INSTAGRAM_LINK, TWITTER_LINK } from "../../../../config/config.service.js";
 
-export const emailTemplate = ({code,title}={}) => {
-  return `<!DOCTYPE html>
+export const emailTemplate = ({ code, title } = {}) => {
+    return `<!DOCTYPE html>
                 <html>
                 <head>
                     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"></head>

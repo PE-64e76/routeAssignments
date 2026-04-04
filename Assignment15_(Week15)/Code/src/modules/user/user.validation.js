@@ -4,11 +4,11 @@ import { generalValidationFields } from "../../common/utils/validation.js";
 
 export const updatePassword = {
   body: joi.object().keys({
-    oldPassword:generalValidationFields.password.required(),
-    password:generalValidationFields.password.not(joi.ref("oldPassword")).required(),
-    confirmPassword:generalValidationFields.confirmPassword("password").required()
+    oldPassword: generalValidationFields.password.required(),
+    password: generalValidationFields.password.not(joi.ref("oldPassword")).required(),
+    confirmPassword: generalValidationFields.confirmPassword("password").required()
   }).required()
-}
+};
 
 export const shareProfile = {
   params: joi.object({
@@ -30,13 +30,13 @@ export const profileCoverImage = {
 export const profileAttachments = {
   files: joi.object().keys({
     profileImage:
-    joi.array().items(
-      generalValidationFields.file(fileFieldValidation.image).required()
-    ).length(1).required(),
+      joi.array().items(
+        generalValidationFields.file(fileFieldValidation.image).required()
+      ).length(1).required(),
 
     profileCoverImage:
-    joi.array().items(
-      generalValidationFields.file(fileFieldValidation.image).required()
-    ).min(1).max(5).required()
+      joi.array().items(
+        generalValidationFields.file(fileFieldValidation.image).required()
+      ).min(1).max(5).required()
   }).required()
-}
+};

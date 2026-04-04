@@ -1,2 +1,2 @@
-export {default as messageRouter} from './message.controller.js'
-export * from './message.validation.js'
+export { default as messageRouter } from './message.controller.js';
+export * from './message.validation.js';

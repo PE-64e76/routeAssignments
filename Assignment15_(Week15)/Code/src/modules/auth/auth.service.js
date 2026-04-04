@@ -10,53 +10,53 @@ import { createNumberOtp, emailEmitter, emailTemplate, sendEmail } from "../../c
 import { baseRevokeTokenKey, deleteKey, forgotPasswordLinkKey, get, increment, keys, otpBlockKey, otpKey, otpMaxRequestKey, set, ttl } from "../../common/services/index.js";
 import { randomUUID } from "crypto";
 
-const verifyEmailOtp = async ({email, subject = emailEnum.ConfirmEmail, title = "Verify Account"} = {}) => {
-  
+const verifyEmailOtp = async ({ email, subject = emailEnum.ConfirmEmail, title = "Verify Account" } = {}) => {
+
   // Check block condition
-  const blockKey = otpBlockKey({email, type:subject})
-  const remainingBlockTime = await ttl(blockKey) 
+  const blockKey = otpBlockKey({ email, type: subject });
+  const remainingBlockTime = await ttl(blockKey);
   if (remainingBlockTime > 0) {
-    throw ConfilectException({message:`You have reached max trial count please try again after ${remainingBlockTime} seconds`})
+    throw ConfilectException({ message: `You have reached max trial count please try again after ${remainingBlockTime} seconds` });
   }
 
-  const oldCodeTTl = await ttl(otpKey({email,type:subject}))
-  if (oldCodeTTl > 0 ) {
-    throw ConfilectException({message:`Sorry we cannot send new otp until the first one expires, try again after ${oldCodeTTl}`})
+  const oldCodeTTl = await ttl(otpKey({ email, type: subject }));
+  if (oldCodeTTl > 0) {
+    throw ConfilectException({ message: `Sorry we cannot send new otp until the first one expires, try again after ${oldCodeTTl}` });
   }
   // Check max trial count 
-  const maxTrialCountKey = otpMaxRequestKey({email, type:subject})
-  const checkMaxOtpRequest = Number(await get(maxTrialCountKey) || 0)
+  const maxTrialCountKey = otpMaxRequestKey({ email, type: subject });
+  const checkMaxOtpRequest = Number(await get(maxTrialCountKey) || 0);
 
-  
+
   if (checkMaxOtpRequest >= 3) {
     await set({
-      key: otpBlockKey({email, type:subject}),
+      key: otpBlockKey({ email, type: subject }),
       value: 0,
       ttl: 300
-    })
-  
-    throw ConfilectException({message:`You have reached max trial count please try again after 300 seconds`})
+    });
+
+    throw ConfilectException({ message: `You have reached max trial count please try again after 300 seconds` });
   }
 
-  const code = await createNumberOtp()
+  const code = await createNumberOtp();
   await set({
-    key: otpKey({email, type:subject}),
+    key: otpKey({ email, type: subject }),
     value: await generateHash(`${code}`),
     ttl: 120
-  })
+  });
 
-  
-  
+
+
   await sendEmail({
     to: email,
     subject,
-    html: emailTemplate({code, title})
-  })
+    html: emailTemplate({ code, title })
+  });
 
-  checkMaxOtpRequest > 0 ? await increment(maxTrialCountKey) : await set({key:maxTrialCountKey , value: 1, ttl:300})
-  
+  checkMaxOtpRequest > 0 ? await increment(maxTrialCountKey) : await set({ key: maxTrialCountKey, value: 1, ttl: 300 });
+
   return;
-}
+};
 
 export const signup = async (inputs) => {
   const { username, email, password, phone } = inputs;
@@ -64,9 +64,9 @@ export const signup = async (inputs) => {
   const checkUserExist = await findOne({
     model: UserModel,
     filter: { email }
-  })
+  });
   if (checkUserExist) {
-    throw ConfilectException({ message: "Email exist" })
+    throw ConfilectException({ message: "Email exist" });
   }
 
   const user = await createOne({
@@ -78,39 +78,39 @@ export const signup = async (inputs) => {
       phone: await encrypt(phone),
     },
   });
-  
-  emailEmitter.emit("sendEmail", async ()=>{
-    await verifyEmailOtp({email})
-  })
+
+  emailEmitter.emit("sendEmail", async () => {
+    await verifyEmailOtp({ email });
+  });
 
   return user;
 };
 
 export const confirmEmail = async (inputs) => {
-  
+
   const { email, otp } = inputs;
 
   const account = await findOne({
     model: UserModel,
-    filter: { email , confirmEmail:{$exists: false}, provider:providerEnum.System}
-  })
+    filter: { email, confirmEmail: { $exists: false }, provider: providerEnum.System }
+  });
   if (!account) {
-    throw NotFoundException({ message: "Fail to find account" })
+    throw NotFoundException({ message: "Fail to find account" });
   }
 
-  const hashOtp = await get(otpKey({email}))
+  const hashOtp = await get(otpKey({ email }));
   if (!hashOtp) {
-    throw NotFoundException({message:"Expired otp"})
+    throw NotFoundException({ message: "Expired otp" });
   }
   if (!await compareHash(otp, hashOtp)) {
-    throw ConfilectException({message:"Invalid otp"})
+    throw ConfilectException({ message: "Invalid otp" });
   }
-  
-  account.confirmEmail = new Date();
-  await account.save()
 
-  await deleteKey(await keys(otpKey({email})))
-  return ;
+  account.confirmEmail = new Date();
+  await account.save();
+
+  await deleteKey(await keys(otpKey({ email })));
+  return;
 };
 
 export const reSendConfirmEmail = async (inputs) => {
@@ -118,40 +118,40 @@ export const reSendConfirmEmail = async (inputs) => {
 
   const account = await findOne({
     model: UserModel,
-    filter: { 
-      email , 
-      confirmEmail:{$exists: false}, 
-      provider:providerEnum.System
+    filter: {
+      email,
+      confirmEmail: { $exists: false },
+      provider: providerEnum.System
     }
-  })
+  });
   if (!account) {
-    throw NotFoundException({ message: "Fail to find matching account" })
+    throw NotFoundException({ message: "Fail to find matching account" });
   }
-  
-  await verifyEmailOtp({email})
 
-  return ;
+  await verifyEmailOtp({ email });
+
+  return;
 };
 
-export const requestForgotPasswordLink = async ({email} = {}, issuer) => {
+export const requestForgotPasswordLink = async ({ email } = {}, issuer) => {
   const account = await findOne({
-    model:UserModel, 
-    filter:{
+    model: UserModel,
+    filter: {
       email,
-      confirmEmail:{$exists:true},
-      provider:providerEnum.System
+      confirmEmail: { $exists: true },
+      provider: providerEnum.System
     }
-  })
+  });
   if (!account) {
-    throw NotFoundException({message:"Invalid Account"})
+    throw NotFoundException({ message: "Invalid Account" });
   }
 
-  const token = randomUUID()
+  const token = randomUUID();
   await set({
-    key: forgotPasswordLinkKey({userId: account._id}),
+    key: forgotPasswordLinkKey({ userId: account._id }),
     value: await generateHash(token),
     ttl: 900
-  })
+  });
 
   const origin = Array.isArray(ORIGINS) && ORIGINS.length ? ORIGINS[0] : issuer;
   const resetLink = `${origin}/auth/reset-password?userId=${account._id}&token=${token}`;
@@ -159,98 +159,98 @@ export const requestForgotPasswordLink = async ({email} = {}, issuer) => {
   await sendEmail({
     to: email,
     subject: emailEnum.ForgortPassword,
-    html: emailTemplate({code:`<a href="${resetLink}">Reset Password</a>`, title:"Reset Password"})
-  })
+    html: emailTemplate({ code: `<a href="${resetLink}">Reset Password</a>`, title: "Reset Password" })
+  });
 
   return;
-}
+};
 
 // Forgot-password
-export const requestForgotPasswordCode = async({email}) =>{
+export const requestForgotPasswordCode = async ({ email }) => {
   const account = await findOne({
-    model:UserModel, 
-    filter:{
+    model: UserModel,
+    filter: {
       email,
-      confirmEmail:{$exists:true},
-      provider:providerEnum.System
+      confirmEmail: { $exists: true },
+      provider: providerEnum.System
     }
-  })
+  });
   if (!account) {
-    throw NotFoundException({message:"Invalid Account"})
+    throw NotFoundException({ message: "Invalid Account" });
   }
-    await verifyEmailOtp({email, subject:emailEnum.ForgortPassword})
+  await verifyEmailOtp({ email, subject: emailEnum.ForgortPassword });
   return;
-}
+};
 
 
-export const verifyForgotPasswordCode = async({email, otp}) =>{
-  const hashOtp = await get(otpKey({email, type:emailEnum.ForgortPassword}))
+export const verifyForgotPasswordCode = async ({ email, otp }) => {
+  const hashOtp = await get(otpKey({ email, type: emailEnum.ForgortPassword }));
   if (!hashOtp) {
-    throw NotFoundException({message:`Expired OTP`})
+    throw NotFoundException({ message: `Expired OTP` });
   }
   if (!await compareHash(otp, hashOtp)) {
-    throw ConfilectException({message:`Invalid OTP`})
+    throw ConfilectException({ message: `Invalid OTP` });
   }
   return;
-}
+};
 
-export const resetForgotPasswordCode = async({email, otp, password}) =>{
-  await verifyForgotPasswordCode({email,otp})
+export const resetForgotPasswordCode = async ({ email, otp, password }) => {
+  await verifyForgotPasswordCode({ email, otp });
   const account = await findOneAndUpdate({
-    model:UserModel,
-    filter:{
-      email , 
-      confirmEmail:{$exists: true}, 
-      provider:providerEnum.System
+    model: UserModel,
+    filter: {
+      email,
+      confirmEmail: { $exists: true },
+      provider: providerEnum.System
     },
-    update:{
+    update: {
       password: await generateHash(password),
       changeCredentialsTime: new Date()
     }
-  })
+  });
   if (!account) {
-    throw NotFoundException({message:"Invalid account"})
+    throw NotFoundException({ message: "Invalid account" });
   }
-  const otpKeys = await keys(otpKey({email, type:emailEnum.ForgortPassword}))
-  const tokenKeys = await keys(await keys(baseRevokeTokenKey(account._id)))
-  await deleteKey([...otpKeys, ...tokenKeys])
-  
-  return;
-}
+  const otpKeys = await keys(otpKey({ email, type: emailEnum.ForgortPassword }));
+  const tokenKeys = await keys(await keys(baseRevokeTokenKey(account._id)));
+  await deleteKey([...otpKeys, ...tokenKeys]);
 
-export const resetForgotPasswordLink = async ({userId, token, password} = {}) => {
-  const storedHash = await get(forgotPasswordLinkKey({userId}))
+  return;
+};
+
+export const resetForgotPasswordLink = async ({ userId, token, password } = {}) => {
+  const storedHash = await get(forgotPasswordLinkKey({ userId }));
   if (!storedHash) {
-    throw NotFoundException({message:"Expired or invalid reset link"})
+    throw NotFoundException({ message: "Expired or invalid reset link" });
   }
 
-  const isValid = await compareHash(token, storedHash)
+  const isValid = await compareHash(token, storedHash);
   if (!isValid) {
-    throw ConfilectException({message:"Invalid reset link"})
+    throw ConfilectException({ message: "Invalid reset link" });
   }
 
   const account = await findOneAndUpdate({
-    model:UserModel,
-    filter:{
-      _id: userId , 
-      confirmEmail:{$exists: true}, 
-      provider:providerEnum.System
+    model: UserModel,
+    filter: {
+      _id: userId,
+      confirmEmail: { $exists: true },
+      provider: providerEnum.System
     },
-    update:{
+    update: {
       password: await generateHash(password),
       changeCredentialsTime: new Date()
     }
-  })
+  });
   if (!account) {
-    throw NotFoundException({message:"Invalid account"})
+    throw NotFoundException({ message: "Invalid account" });
   }
 
-  const linkKey = await keys(forgotPasswordLinkKey({userId}))
-  const tokenKeys = await keys(await keys(baseRevokeTokenKey(account._id)))
-  await deleteKey([...linkKey, ...tokenKeys])
+  const linkKey = await keys(forgotPasswordLinkKey({ userId }));
+  const tokenKeys = await keys(await keys(baseRevokeTokenKey(account._id)));
+  await deleteKey([...linkKey, ...tokenKeys]);
 
   return;
-}
+};
 
 
 export const login = async (inputs, issuer) => {

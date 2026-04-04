@@ -35,5 +35,4 @@ export const APPLICATION_NAME = process.env.APPLICATION_NAME
 export const TWITTER_LINK = process.env.TWITTER_LINK 
 export const FACEBOOK_LINK = process.env.FACEBOOK_LINK 
 export const INSTAGRAM_LINK = process.env.INSTAGRAM_LINK 
-
 export const ORIGINS = process.env.ORIGINS.split(',')

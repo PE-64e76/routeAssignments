@@ -6,13 +6,13 @@ const ENCRYPTION_SECRET_KEY = Buffer.from(ENC_BYTE);
 export const encrypt = async (text) => {
     const iv = crypto.randomBytes(IV_LENGTH);
 
-    const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_SECRET_KEY, iv); 
+    const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_SECRET_KEY, iv);
 
     let encryptedData = cipher.update(text, 'utf-8', 'hex');
     encryptedData += cipher.final('hex');
 
     return `${iv.toString('hex')}:${encryptedData}`;
-}
+};
 
 export const decrypt = async (encryptedData) => {
     const [iv, encryptedText] = encryptedData.split(":");
@@ -25,4 +25,4 @@ export const decrypt = async (encryptedData) => {
     decryptedData += decipher.final('utf-8');
 
     return decryptedData;
-}
+};
