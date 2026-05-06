@@ -270,6 +270,7 @@ export const login = async (inputs, issuer) => {
   return await createLoginCredentials(user, issuer);
 };
 
+// Signup with gmail
 const verifyGoogleAccount = async (idToken) => {
   const client = new OAuth2Client();
   const ticket = await client.verifyIdToken({
@@ -282,6 +283,16 @@ const verifyGoogleAccount = async (idToken) => {
   }
   return payload;
 };
+
+export const loginWithGmail = async ({ idToken }, issuer) => {
+  const payload = await verifyGoogleAccount(idToken);
+  const user = await findOne({ model: UserModel, filter: { email: payload.email, provider: providerEnum.Google } });
+  if (!user) {
+    throw NotFoundException({ message: "Invalid login data" });
+  }
+  return await createLoginCredentials(user, issuer);
+};
+
 
 export const signupWithGmail = async ({ idToken }, issuer) => {
   const payload = await verifyGoogleAccount(idToken);
@@ -310,11 +321,3 @@ export const signupWithGmail = async ({ idToken }, issuer) => {
   return { account: await createLoginCredentials(user[0], issuer) };
 };
 
-export const loginWithGmail = async ({ idToken }, issuer) => {
-  const payload = await verifyGoogleAccount(idToken);
-  const user = await findOne({ model: UserModel, filter: { email: payload.email, provider: providerEnum.Google } });
-  if (!user) {
-    throw NotFoundException({ message: "Invalid login data" });
-  }
-  return await createLoginCredentials(user, issuer);
-};

@@ -20,6 +20,19 @@ export const verifyToken = async ({
   return jwt.verify(token, secret);
 };
 
+export const getSignatureLevel = async (audienceType) => {
+  let signatureLevel = audienceEnum.User;
+  switch (audienceType) {
+    case audienceEnum.System:
+      signatureLevel = roleEnum.Admin;
+      break;
+    default:
+      signatureLevel = roleEnum.User;
+      break;
+  }
+  return signatureLevel;
+};
+
 export const getTokenSignature = async (role) => {
   let accessSignature = undefined;
   let refreshSignature = undefined;
@@ -37,49 +50,6 @@ export const getTokenSignature = async (role) => {
       break;
   }
   return { accessSignature, refreshSignature, audience };
-};
-
-export const getSignatureLevel = async (audienceType) => {
-  let signatureLevel = audienceEnum.User;
-  switch (audienceType) {
-    case audienceEnum.System:
-      signatureLevel = roleEnum.Admin;
-      break;
-    default:
-      signatureLevel = roleEnum.User;
-      break;
-  }
-  return signatureLevel;
-};
-
-
-
-export const createLoginCredentials = async (user, issuer) => {
-
-  const { accessSignature, refreshSignature, audience } = await getTokenSignature(user.role);
-
-  const jwtid = randomUUID();
-  const access_token = await generateToken({
-    payload: { sub: user._id },
-    secret: accessSignature,
-    options: {
-      issuer,
-      audience: [tokenTypeEnum.access, audience],
-      expiresIn: ACCESS_EXPIRES_IN,
-      jwtid
-    }
-  });
-  const refresh_token = await generateToken({
-    payload: { sub: user._id },
-    secret: refreshSignature,
-    options: {
-      issuer,
-      audience: [tokenTypeEnum.refresh, audience],
-      expiresIn: REFRESH_EXPIRES_IN,
-      jwtid
-    }
-  });
-  return { access_token, refresh_token };
 };
 
 export const decodeToken = async ({ token, tokenType = tokenTypeEnum.access } = {}) => {
@@ -125,4 +95,32 @@ export const decodeToken = async ({ token, tokenType = tokenTypeEnum.access } = 
     throw UnauthorizedException({ message: `Invalid login session` });
   }
   return { user, decoded };
+};
+
+export const createLoginCredentials = async (user, issuer) => {
+
+  const { accessSignature, refreshSignature, audience } = await getTokenSignature(user.role);
+
+  const jwtid = randomUUID();
+  const access_token = await generateToken({
+    payload: { sub: user._id },
+    secret: accessSignature,
+    options: {
+      issuer,
+      audience: [tokenTypeEnum.access, audience],
+      expiresIn: ACCESS_EXPIRES_IN,
+      jwtid
+    }
+  });
+  const refresh_token = await generateToken({
+    payload: { sub: user._id },
+    secret: refreshSignature,
+    options: {
+      issuer,
+      audience: [tokenTypeEnum.refresh, audience],
+      expiresIn: REFRESH_EXPIRES_IN,
+      jwtid
+    }
+  });
+  return { access_token, refresh_token };
 };
