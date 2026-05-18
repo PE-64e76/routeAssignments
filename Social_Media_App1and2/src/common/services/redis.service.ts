@@ -25,23 +25,23 @@ export class RedisService {
     }
 
 
-    otpKey({ email, subject = EmailEnum.ConfirmEmail }: BaseKeyType):string {
+    otpKey({ email, subject = EmailEnum.ConfirmEmail }: BaseKeyType): string {
         return `OTP::User::${email}::${subject}`;
     };
 
-    maxTrialOtpKey({ email, subject = EmailEnum.ConfirmEmail }: BaseKeyType):string {
+    maxTrialOtpKey({ email, subject = EmailEnum.ConfirmEmail }: BaseKeyType): string {
         return `${this.otpKey({ email, subject })}::MaxTrial`;
     };
 
-    blockOtpKey({ email, subject = EmailEnum.ConfirmEmail }: BaseKeyType):string {
+    blockOtpKey({ email, subject = EmailEnum.ConfirmEmail }: BaseKeyType): string {
         return `${this.otpKey({ email, subject })}::Block`;
     };
 
-    baseRevokeTokenKey(userId: Types.ObjectId | string):string {
+    baseRevokeTokenKey(userId: Types.ObjectId | string): string {
         return `RevokeToken::User::${userId.toString()}`;
     };
 
-    revokeTokenKey({ userId, jti }: { userId: Types.ObjectId | string, jti: string; }):string {
+    revokeTokenKey({ userId, jti }: { userId: Types.ObjectId | string, jti: string; }): string {
         return `${this.baseRevokeTokenKey(userId)}::${jti}`;
     };
 
@@ -95,7 +95,7 @@ export class RedisService {
         return;
     };
 
-    public async keys(prefix: string):Promise<string[]> {
+    public async keys(prefix: string): Promise<string[]> {
         try {
             return await this.client.keys(`${prefix}*`);
         } catch (error) {

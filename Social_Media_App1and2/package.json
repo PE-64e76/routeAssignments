@@ -1,5 +1,5 @@
 {
-  "name": "assignment17_(week17)",
+  "name": "assignment17and18(week17and18)",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main.js",
@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.65.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
