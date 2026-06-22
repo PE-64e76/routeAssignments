@@ -1,0 +1,5 @@
+node_modules
+src/config/my-projects-94bb7-firebase-adminsdk-fbsvc-6a1668f5ab.json
+.env.development
+.env.production
+dist

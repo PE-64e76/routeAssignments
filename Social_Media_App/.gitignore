@@ -1,0 +1,7 @@
+node_modules
+.env.development
+.env.production
+src/config/my-projects-94bb7-firebase-adminsdk-fbsvc-6a1668f5ab.json
+dist
+tsconfig.json
+ChatAppFE/node_modules
